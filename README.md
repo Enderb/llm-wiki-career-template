@@ -28,6 +28,18 @@ Paste any target job URL or raw job description into your AI agent chat and exec
 
 ---
 
+## 🌐 Optional: Fast Web Clipping
+
+Instead of copying and pasting job descriptions manually, use the official **[Obsidian Web Clipper](https://obsidian.md/clipper)** extension for Chrome, Firefox, or Safari:
+
+1. Install the extension in your browser.
+2. Open any job posting on LinkedIn, Indeed, or Greenhouse.
+3. Click the Web Clipper extension icon.
+4. Set the save location folder to `10_Raw/Job-Postings/` and hit **Save**.
+5. Tell Open Code: *"Run Workflow C on `@10_Raw/Job-Postings/[Clipped_Note_Name].md`"*
+
+---
+
 ## 🧠 How Obsidian & Open Code Work Together
 
 This vault uses the **LLM Wiki pattern**: a system where human-readable markdown files serve as a shared, transparent memory between you and an AI assistant.
