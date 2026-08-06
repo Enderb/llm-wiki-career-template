@@ -1,0 +1,8 @@
+# Obsidian personal cache
+.obsidian/workspace*
+.obsidian/cache
+.obsidian/indexed-db
+
+# OS files
+.DS_Store
+Thumbs.db

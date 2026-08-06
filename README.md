@@ -9,7 +9,7 @@ An intelligent, persistent career knowledge base for Obsidian built on top of th
 ### 1. Initialize Your Ground Truth
 
 **Option A: Automated Onboarding (Recommended)**
-1. Export your LinkedIn profile: Go to your LinkedIn profile page $\rightarrow$ Click **More** $\rightarrow$ Select **Save to PDF**.
+1. Export your LinkedIn profile: Go to your LinkedIn profile page -> Click **More** -> Select **Save to PDF**.
 2. Drop your LinkedIn PDF and your current CV file (PDF or DOCX) into `/10_Raw/Ground-Truth/`.
 3. Open Open Code inside this folder and run:
    > *"Run Workflow 0 to initialize my ground-truth files from the PDFs in `/10_Raw/Ground-Truth/`."*
@@ -19,10 +19,7 @@ An intelligent, persistent career knowledge base for Obsidian built on top of th
 2. Copy `Master_CV_TEMPLATE.md` to `Master_CV.md` and fill in your experience.
 3. Copy `LinkedIn_Profile_TEMPLATE.md` to `LinkedIn_Profile.md` and paste your profile context.
 
-### 2. Configure Obsidian Attachments
-In Obsidian, open **Settings** $\rightarrow$ **Files and links** $\rightarrow$ Change **Default location for new attachments** to *In the folder specified below* and set the path to `10_Raw/Assets`.
-
-### 3. Run Automated Application Workflows
+### 2. Run Automated Application Workflows
 Paste any target job URL or raw job description into your AI agent chat and execute:
 > *"Run Workflow C on [Job Posting URL or File]"*
 
@@ -55,8 +52,7 @@ This vault uses the **LLM Wiki pattern**: a system where human-readable markdown
 ### 1. Setting Up Obsidian
 1. Download and install **[Obsidian](https://obsidian.md/)** (free for Windows, Mac, Linux).
 2. Launch Obsidian and select **"Open folder as vault"**.
-3. Choose this repository folder (`llm-wiki-career-template` or your cloned copy).
-4. Set attachment directory: Go to **Settings** (gear icon) $\rightarrow$ **Files and links** $\rightarrow$ set **Default location for new attachments** to *In the folder specified below* and enter `10_Raw/Assets`.
+3. Choose this repository folder (`llm-wiki-career-template` or your cloned copy). The attachment folder is already pre-configured to `10_Raw/Assets` via `.obsidian/app.json`.
 
 ### 2. Setting Up Open Code
 1. Download and install **[Open Code](https://opencode.ai)** (or your preferred local terminal AI engine/extension).
