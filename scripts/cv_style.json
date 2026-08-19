@@ -1,0 +1,49 @@
+{
+  "page_size": "LETTER",
+  "font_family": "Carlito",
+  "colors": {
+    "NAVY": "#1f3864",
+    "GRAY": "#595959",
+    "BODY": "#222222"
+  },
+  "sizes": {
+    "name": 17.0,
+    "section": 11.0,
+    "body": 10.0,
+    "role": 10,
+    "tech": 9,
+    "bullet": 10,
+    "skill": 9.5,
+    "edu_deg": 10,
+    "edu_school": 9.5,
+    "contact": 9
+  },
+  "leading": {
+    "body": 12.2,
+    "section": 13.0,
+    "role": 11.5,
+    "tech": 11.5,
+    "bullet": 12.2,
+    "skill": 13.1,
+    "contact": 12.2,
+    "name": 19.0
+  },
+  "margins": {
+    "left": 45.1,
+    "right": 43.2,
+    "top": 52.0,
+    "bottom": 45.0
+  },
+  "indents": {
+    "bullet_x": 49.1,
+    "bullet_text_x": 63.5,
+    "bullet_indent": 4.0,
+    "text_indent": 18.4
+  },
+  "date_tab_x": 297,
+  "inline_dates": [
+    "Elevat",
+    "Microsoft"
+  ],
+  "source_pdf": null
+}
