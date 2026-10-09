@@ -29,7 +29,7 @@ Workflow B renders every tailored CV to a PDF automatically (matching the stylin
 
 1. Run `scripts/setup.sh` once — it creates a Python venv (`~/.opencode-cv/venv`) and installs `reportlab` + `pdfminer.six`.
 2. If you onboarded with a PDF CV (Workflow 0), styling is auto-detected into `scripts/cv_style.json` from `10_Raw/Assets/source-cv.pdf`. No PDF? Rendering falls back to clean defaults — no action needed.
-3. Manual re-render any time: `scripts/cv_pdf.py 20_Wiki/Career/CV_[Company]_[Role].md`
+3. Manual re-render any time: `scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md`
 
 Output lands in `20_Wiki/Assets/` as `Ender_Barillas_CV_[Company]_[Role].pdf` by default; pass `--prefix YourName_` (e.g. `--prefix Maria_Lopez_`) to change the filename prefix for your own name.
 
@@ -94,7 +94,7 @@ Use the templates in `10_Raw/Career-Inputs/` to keep inputs consistent.
 | `10_Raw/Sources/` | Web articles, market research, or industry notes. | **Read-Only Context** |
 | `10_Raw/Career-Inputs/` | Raw personal career inputs: feedback, project notes, and reflections (`Feedback/`, `Projects/`, `Notes/`). | **Read-Only Context** |
 | `10_Raw/Assets/` | Central bucket for images, attachments, and PDF exports. | **Binary Media Storage** |
-| `20_Wiki/Career/` | AI-generated tailored resumes (`CV_[Company]_[Role].md`), match reports, the running [[Accomplishment-Log]], and the compiled [[Living-Resume]]. | **Compiled AI Layer** |
+| `20_Wiki/Career/` | Career workspace: the running [[Accomplishment-Log]], the compiled [[Living-Resume]], and the [[Applications-Tracker]] hub. One folder per company under `20_Wiki/Career/Applications/[Company]/` holds that employer's working files (tailored `CV_*.md`, cover letter, outreach `Message_*.md`, interview prep). | **Compiled AI Layer** |
 | `20_Wiki/Entities/` | Knowledge pages for companies, tools, and recruiters automatically created by the agent. | **Compiled AI Layer** |
 | `20_Wiki/Concepts/` | Evergreen topic pages and domain summaries synthesized across sources. | **Compiled AI Layer** |
 | `20_Wiki/Assets/` | Generated PDF resumes rendered by `scripts/cv_pdf.py` from `CV_*.md`. | **Generated Binary Output** |

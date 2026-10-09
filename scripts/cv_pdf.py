@@ -162,12 +162,10 @@ class Render:
         body = header[len("### "):]
         name, _, rest = body.partition(" \u00b7 ")
         date = rest.strip().strip("*").strip()
-        tab = bool(self.TAB) and not any(w in name for w in self.inline_dates)
-        gap = self.spaces_to(self.TAB, name, "Carlito-Bold", self.sz["body"] + 0.5) if tab else "&#160;&#160;"
         self.story.append(Paragraph(
             '<font name="%s" color="%s"><b>%s</b></font>'
-            '<font name="%s" color="%s">%s%s</font>'
-            % (self.family, self.c["BODY"], name, self.family, self.c["GRAY"], gap, date),
+            '<font name="%s" color="%s">&#160;&#160;%s</font>'
+            % (self.family, self.c["BODY"], name, self.family, self.c["GRAY"], date),
             self.s_company))
 
     def role(self, line):
@@ -214,13 +212,11 @@ class Render:
         if not dm:
             return
         date, school = dm.group(1), dm.group(2)
-        plain = re.sub(r"\*\*|\*", "", left)
         self.story.append(Paragraph(
             '<font name="%s" color="%s"><b>%s</b></font>'
-            '<font name="%s" color="%s">%s%s</font>'
+            '<font name="%s" color="%s">&#160;&#160;%s</font>'
             % (self.family, self.c["BODY"], self.inline(left),
-               self.family, self.c["GRAY"],
-               self.spaces_to(self.TAB, plain, "Carlito-Bold", self.sz["edu_deg"]), self.inline(date)),
+               self.family, self.c["GRAY"], self.inline(date)),
             self.s_edudeg))
         self.story.append(Paragraph(self.inline(school), self.s_edusch))
 
@@ -307,8 +303,14 @@ class Render:
 
 def default_out(md_path, prefix="Ender_Barillas"):
     base = os.path.basename(md_path).replace(".md", "")
-    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(md_path))), "Assets",
-                        prefix + "_" + base + ".pdf")
+    d = os.path.dirname(os.path.abspath(md_path))
+    node = d
+    while node and node != os.path.dirname(node):
+        if os.path.basename(node) == "Career":
+            return os.path.join(os.path.dirname(node), "Assets",
+                                prefix + "_" + base + ".pdf")
+        node = os.path.dirname(node)
+    return os.path.join(d, "Assets", prefix + "_" + base + ".pdf")
 
 
 def main():
