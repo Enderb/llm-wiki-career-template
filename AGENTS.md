@@ -77,7 +77,7 @@ On every content ingestion or wiki modification:
 
 1. Parse the user's provided CV file (PDF, DOCX, or text) from `/10_Raw/Ground-Truth/`, format it into clean Markdown, and save as `/10_Raw/Ground-Truth/Master_CV.md`.
 2. Parse the provided LinkedIn file/text (e.g., LinkedIn PDF export), convert it to structured Markdown, and save as `/10_Raw/Ground-Truth/LinkedIn_Profile.md`.
-3. Remove placeholder template files (`Master_CV_TEMPLATE.md` and `LinkedIn_Profile_TEMPLATE.md`).
+3. Resolve onboarding placeholders: remove `Master_CV_TEMPLATE.md` and `LinkedIn_Profile_TEMPLATE.md`, and copy `Accomplishment-Log_TEMPLATE.md` → `Accomplishment-Log.md`, `Living-Resume_TEMPLATE.md` → `Living-Resume.md`, and `Applications-Tracker_TEMPLATE.md` → `Applications-Tracker.md` (delete the `_TEMPLATE` originals) so the `[[Accomplishment-Log]]`, `[[Living-Resume]]` and `[[Applications-Tracker]]` links resolve.
 4. If the provided CV was a PDF, save an unmodified copy to `/10_Raw/Assets/` (e.g. `source-cv.pdf`) as the styling reference, run `scripts/setup.sh` once, then run `scripts/cv_style.py /10_Raw/Assets/source-cv.pdf` to generate `scripts/cv_style.json`. If only a DOCX/text CV exists, skip this step — the PDF renderer falls back to clean defaults.
 5. Update `log.md` with: `## [YYYY-MM-DD] init | Ground truth files initialized from source documents`.
 
@@ -121,3 +121,40 @@ When asked to search for jobs online or process a job URL:
 4. Update or create relevant pages in `20_Wiki/Entities/` and `20_Wiki/Concepts/`.
 5. Regenerate `20_Wiki/Career/Living-Resume.md` from the [[Accomplishment-Log]] + `Master_CV.md`. Keep `Master_CV.md` immutable.
 6. Execute Standard Maintenance Protocol (update `index.md`, append to `log.md`).
+
+### Workflow E: Outreach & Networking
+
+**Trigger:** "Draft a connection note", "Write an outreach message", "Message the recruiter/hiring manager", "Follow up with [contact]".
+
+**Execution Steps:**
+
+1. Identify the contact and company; read the relevant `20_Wiki/Career/Applications/[Company]/` files and the [[Applications-Tracker]] row so the message reflects the exact role(s) applied to.
+2. Create or update a person/company page in `20_Wiki/Entities/` when the contact matters beyond a single message.
+3. Draft the message into `20_Wiki/Career/Applications/[Company]/Message_[Company]_[Role].md` (use `Message_[Company]_Outreach.md` when it spans several roles). Respect the platform's character limit for connection requests; add a short post-accept follow-up when useful.
+4. Ground every claim in `10_Raw/Ground-Truth/`; never fabricate names, titles, tenure, or shared connections.
+5. Link the message from the tracker's Notes column; update `index.md` and append to `log.md`.
+
+### Workflow F: Interview Prep & Debrief
+
+**Trigger:** "Prep me for my [Company] interview", "I have an interview with [Company]", "Debrief my interview".
+
+**Execution Steps:**
+
+1. Read the posting, the tailored CV, [[Living-Resume]], [[Accomplishment-Log]], and the company page in `20_Wiki/Entities/`.
+2. Research the company, role, and interviewers (Workflow A for any new sources) and update the company entity page.
+3. Write `20_Wiki/Career/Applications/[Company]/Interview_Prep_[Company]_[Date].md`: company context, role-mapped STAR talking points, likely questions with honest answers, skill-gap handling, and questions to ask.
+4. Set the tracker status to **Interview**.
+5. After the interview: save raw debrief notes to `10_Raw/Career-Inputs/Notes/`, distill new evidence/feedback into the [[Accomplishment-Log]], update the tracker status, and log.
+
+### Workflow G: Vault Maintenance / Lint
+
+**Trigger:** "Run vault maintenance", "Lint the vault", "Check the wiki", "Is the index up to date?".
+
+**Execution Steps:**
+
+1. Reconcile `index.md` against the actual `20_Wiki/` files — add missing pages, flag stale entries.
+2. Detect orphan pages (no inbound `[[links]]`) and broken `[[wikilinks]]`; fix or flag each.
+3. Flag duplicate pages (same company/role/concept) and propose merges.
+4. Confirm every `10_Raw/Sources/` and `10_Raw/Job-Postings/` file is linked from `index.md` (nothing left unprocessed) and that `10_Raw/` and `10_Raw/Assets/` were never modified.
+5. Verify each [[Applications-Tracker]] row matches its `Applications/[Company]/` folder; flag applications missing a CV, cover letter, or PDF.
+6. Append a `maintenance` entry to `log.md` summarizing findings and any fixes applied.
