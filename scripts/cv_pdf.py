@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render a compiled CV markdown (20_Wiki/Career/CV_*.md) into a styled PDF.
+"""Render a compiled CV markdown (20_Wiki/Career/Applications/[Company]/CV_*.md) into a styled PDF.
 
 Styling comes from scripts/cv_style.json, which cv_style.py extracts from the
 reference resume PDF added during ground-truth onboarding. Only the CV body is
@@ -7,8 +7,8 @@ rendered -- Match Summary / Application Notes / SOURCES are working documents
 and are excluded.
 
 Usage:
-    python cv_pdf.py 20_Wiki/Career/CV_Maxon_Full-Stack-Developer.md
-    python cv_pdf.py 20_Wiki/Career/CV_Universal-Generalist.md --out 20_Wiki/Assets/Ender_Barillas_CV_Universal_2026.pdf
+    python cv_pdf.py 20_Wiki/Career/Applications/Maxon/CV_Maxon_Full-Stack-Developer.md
+    python cv_pdf.py 20_Wiki/Career/Applications/Maxon/CV_Maxon_Full-Stack-Developer.md --out 20_Wiki/Assets/Your_Name_CV_Maxon_Full-Stack-Developer.pdf
     python cv_pdf.py <md> --style <json>   # override style config
 """
 import argparse
@@ -301,7 +301,7 @@ class Render:
         self.doc.build(self.story)
 
 
-def default_out(md_path, prefix="Ender_Barillas"):
+def default_out(md_path, prefix="Your_Name"):
     base = os.path.basename(md_path).replace(".md", "")
     d = os.path.dirname(os.path.abspath(md_path))
     node = d
@@ -317,8 +317,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("markdown")
     ap.add_argument("--out")
-    ap.add_argument("--prefix", default="Ender_Barillas",
-                    help="output filename prefix (default: Ender_Barillas)")
+    ap.add_argument("--prefix", default="Your_Name",
+                    help="output filename prefix (default: Your_Name)")
     ap.add_argument("--style", default=DEFAULT_STYLE)
     args = ap.parse_args()
 

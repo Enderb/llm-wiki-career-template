@@ -98,7 +98,7 @@ When asked to tailor a CV for a target job posting in `10_Raw/Job-Postings/`:
 2. Generate match summary (Match Score %, Key Strengths, Skill Gaps).
 3. Create `20_Wiki/Entities/[Company].md` if it does not exist.
 4. Output tailored resume in `20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` using standard ATS action-verb structures.
-5. Render the tailored CV to PDF: `scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` → `20_Wiki/Assets/Ender_Barillas_CV_[Company]_[Role].pdf` (pass `--prefix YourName_` on a fork for a different owner). The pipeline resolves `20_Wiki/Assets/` automatically for any CV anywhere under `20_Wiki/Career/`. This formats the markdown with the styling template detected during Workflow 0.
+5. Render the tailored CV to PDF: `scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` → `20_Wiki/Assets/Your_Name_CV_[Company]_[Role].pdf` (override the filename with `--prefix Your_Name`). The pipeline resolves `20_Wiki/Assets/` automatically for any CV anywhere under `20_Wiki/Career/`. This formats the markdown with the styling template detected during Workflow 0.
 6. Execute Standard Maintenance Protocol — including adding/updating the application's row in `20_Wiki/Career/Applications-Tracker.md`.
 7. Optional outreach: draft connection/outreach notes as `Message_[Company]_[Role].md` in the same company folder and link them from the tracker's Notes column.
 
