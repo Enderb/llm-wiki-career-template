@@ -26,13 +26,13 @@ You are an intelligent knowledge assistant, research partner, and technical recr
 | `20_Wiki/Career/` | Career workspace. **Applications live one folder per company** under `20_Wiki/Career/Applications/[Company]/` (tailored CV, cover letter, message, interview prep together, one folder per company). The [[Applications-Tracker]] in the Career root is the single navigation hub for every application (company, role, match %, status, links to CV/cover letter/PDF). Also holds the running [[Accomplishment-Log]] and the compiled [[Living-Resume]] | Create one page per application/posting; maintain the tracker, log and living resume via Workflow D. |
 | `20_Wiki/Concepts/` | Evergreen atomic topic summaries | Create for recurring concepts/terms. |
 | `20_Wiki/Entities/` | Company, tool, and person profiles (people, companies, products) | Create one page per entity. |
-| `20_Wiki/Assets/` | Generated PDF resumes rendered by `scripts/cv_pdf.py` from `CV_*.md`; binary output | Generated; never hand-edit, regenerate via the pipeline. |
+| `20_Wiki/Assets/` | Generated PDF resumes for CVs outside a company folder (the universal CV → `Your_Name_CV_Universal-Generalist.pdf`); tailored CV PDFs render into their `Applications/[Company]/` folder instead | Generated; never hand-edit, regenerate via the pipeline. |
 | `scripts/` | CV PDF pipeline: `cv_style.py` (extract composite styling → `cv_style.json`), `cv_pdf.py` (render `CV_*.md` → PDF), bundled fonts, `setup.sh` | Local tooling; edit freely. |
 | `/10_Raw/Assets/` | Downloaded images, diagrams, and local media | Store binaries and media here, never in wiki pages. |
 
 ## Career Workspace Layout
 
-- `20_Wiki/Career/Applications/[Company]/` — **one folder per company.** Keep all of an employer's working files together: tailored `CV_[Company]_[Role].md`, `Cover_Letter_[Company]_[Role].md`, `Message_[Company]_[Role].md` (outreach / LinkedIn connection notes), and interview prep (e.g. `Interview_Prep_[Company]_[Date].md`). Multiple roles at the same company share the one folder.
+- `20_Wiki/Career/Applications/[Company]/` — **one folder per company.** Keep all of an employer's working files together: tailored `CV_[Company]_[Role].md` and its rendered `CV_[Company]_[Role].pdf` (written automatically by `scripts/cv_pdf.py`), `Cover_Letter_[Company]_[Role].md`, `Message_[Company]_[Role].md` (outreach / LinkedIn connection notes), and interview prep (e.g. `Interview_Prep_[Company]_[Date].md`). Multiple roles at the same company share the one folder.
 - `20_Wiki/Career/Applications-Tracker.md` — the single navigation hub. Add one row per application (company, role, match %, status, notes, links to CV / cover letter / PDF) and keep it current.
 - `20_Wiki/Career/` root — holds only [[Living-Resume]], [[Accomplishment-Log]], [[CV_Universal-Generalist]], and the [[Applications-Tracker]].
 
@@ -98,7 +98,7 @@ When asked to tailor a CV for a target job posting in `10_Raw/Job-Postings/`:
 2. Generate match summary (Match Score %, Key Strengths, Skill Gaps).
 3. Create `20_Wiki/Entities/[Company].md` if it does not exist.
 4. Output tailored resume in `20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` using standard ATS action-verb structures.
-5. Render the tailored CV to PDF: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` → `20_Wiki/Assets/Your_Name_CV_[Company]_[Role].pdf` (override the filename with `--prefix Your_Name`). Run `scripts/setup.sh` once first to create the venv — the renderer's dependencies are not installed globally. The pipeline resolves `20_Wiki/Assets/` automatically for any CV anywhere under `20_Wiki/Career/`. This formats the markdown with the styling template detected during Workflow 0.
+5. Render the tailored CV to PDF: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md`. Run `scripts/setup.sh` once first to create the venv — the renderer's dependencies are not installed globally. The renderer writes exactly one PDF, next to the source markdown as `CV_[Company]_[Role].pdf` (any CV under `Applications/[Company]/`; the universal CV in the Career root still renders to `20_Wiki/Assets/` with the `--prefix`). This formats the markdown with the styling template detected during Workflow 0.
 6. Execute Standard Maintenance Protocol — including adding/updating the application's row in `20_Wiki/Career/Applications-Tracker.md`.
 7. Optional outreach: draft connection/outreach notes as `Message_[Company]_[Role].md` in the same company folder and link them from the tracker's Notes column.
 

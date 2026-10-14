@@ -51,7 +51,7 @@ Work through this once before your first application:
 - [ ] `scripts/setup.sh` run once (it prints `ready: …/python`).
 - [ ] Your LinkedIn export and current CV dropped into `10_Raw/Ground-Truth/`.
 - [ ] Workflow 0 run → `Master_CV.md` and `LinkedIn_Profile.md` exist, and the `*_TEMPLATE.md` placeholders are gone.
-- [ ] A test render succeeds: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py <a CV_*.md>` writes a PDF into `20_Wiki/Assets/`.
+- [ ] A test render succeeds: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py <a CV_*.md>` writes a PDF next to the CV (under `Applications/[Company]/`) or into `20_Wiki/Assets/` for a CV in the Career root.
 
 ### 1. Clone and open
 
@@ -91,7 +91,7 @@ If you onboarded with a PDF CV (Workflow 0), the styling is auto-detected into `
 ~/.opencode-cv/venv/bin/python scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md
 ```
 
-Output lands in `20_Wiki/Assets/` as `Your_Name_CV_[Company]_[Role].pdf`; override the prefix with `--prefix Maria_Lopez`. Optional shortcut: `alias cvpdf='~/.opencode-cv/venv/bin/python scripts/cv_pdf.py'`.
+The PDF is written next to the CV as `CV_[Company]_[Role].pdf`, so the whole application folder travels together. A CV outside a company folder (e.g. the universal CV in the Career root) renders into `20_Wiki/Assets/` as `Your_Name_CV_*.pdf`; override the prefix with `--prefix Maria_Lopez`. Optional shortcut: `alias cvpdf='~/.opencode-cv/venv/bin/python scripts/cv_pdf.py'`.
 
 ---
 
@@ -102,6 +102,7 @@ One folder per company, holding everything for that employer together:
 ```
 20_Wiki/Career/Applications/Acme/
 ├── CV_Acme_Senior-Backend-Engineer.md
+├── CV_Acme_Senior-Backend-Engineer.pdf            # rendered PDF (from scripts/cv_pdf.py)
 ├── Cover_Letter_Acme_Senior-Backend-Engineer.md
 ├── Message_Acme_Senior-Backend-Engineer.md      # outreach / LinkedIn note
 └── Interview_Prep_Acme_2026-11-05.md
@@ -180,7 +181,7 @@ Use the templates in `10_Raw/Career-Inputs/` to keep inputs consistent.
 | `20_Wiki/Career/` | The accomplishment log, the living résumé, the applications tracker, and one folder per company under `Applications/[Company]/`. | **Compiled AI layer** |
 | `20_Wiki/Entities/` | Knowledge pages for companies, tools, and people. | **Compiled AI layer** |
 | `20_Wiki/Concepts/` | Evergreen topic and domain summaries synthesized across sources. | **Compiled AI layer** |
-| `20_Wiki/Assets/` | Generated PDF résumés rendered by `scripts/cv_pdf.py`. | **Generated output** |
+| `20_Wiki/Assets/` | Generated PDF résumés for CVs that don't live in an `Applications/[Company]/` folder. | **Generated output** |
 | `scripts/` | CV PDF pipeline: `cv_style.py` (detect styling → `cv_style.json`), `cv_pdf.py` (render `CV_*.md` → PDF), bundled fonts, `setup.sh`. | **Local tooling** |
 | `AGENTS.md` | The rules and workflows the agent follows. | **System config** |
 | `index.md` | Catalog of every wiki note, auto-updated by the agent. | **Navigation ledger** |
@@ -192,7 +193,7 @@ Use the templates in `10_Raw/Career-Inputs/` to keep inputs consistent.
 
 - **A PDF won't render.** Run `scripts/setup.sh` once, then invoke the venv's Python explicitly: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py <path>`.
 - **The PDF looks unstyled.** You're seeing the clean defaults from `scripts/cv_style.json` — run Workflow 0 with a PDF CV so your own styling is auto-detected (DOCX/text CVs fall back to clean defaults).
-- **The PDFs land in the wrong folder.** Run `scripts/cv_pdf.py` against a file under `20_Wiki/Career/`; the resolver finds `20_Wiki/Assets/` automatically from any subfolder.
+- **The PDFs land in the wrong folder.** A CV under `20_Wiki/Career/Applications/[Company]/` renders next to itself; any other CV under `20_Wiki/Career/` renders into `20_Wiki/Assets/`. Pass `--out` to force a path.
 - **Links like `[[Accomplishment-Log]]` are red/unresolved.** Run Workflow 0 to rename the `*_TEMPLATE.md` files to their real names.
 - **Empty folders are missing after a fresh clone.** Git doesn't track empty directories; the template ships `.gitkeep` markers so the full structure is restored.
 - **Can I use a different AI tool?** Yes — any agent that reads `AGENTS.md` works. OpenCode is just the reference engine.

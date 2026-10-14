@@ -6,6 +6,11 @@ reference resume PDF added during ground-truth onboarding. Only the CV body is
 rendered -- Match Summary / Application Notes / SOURCES are working documents
 and are excluded.
 
+When the CV lives under 20_Wiki/Career/Applications/[Company]/, the PDF is
+written next to it as CV_[Company]_[Role].pdf so the whole application travels
+in one folder. CVs elsewhere (e.g. the universal CV in the Career root) render
+to 20_Wiki/Assets/ with the configured prefix.
+
 Usage:
     python cv_pdf.py 20_Wiki/Career/Applications/Maxon/CV_Maxon_Full-Stack-Developer.md
     python cv_pdf.py 20_Wiki/Career/Applications/Maxon/CV_Maxon_Full-Stack-Developer.md --out 20_Wiki/Assets/Your_Name_CV_Maxon_Full-Stack-Developer.pdf
@@ -313,6 +318,8 @@ class Render:
 def default_out(md_path, prefix="Your_Name"):
     base = os.path.basename(md_path).replace(".md", "")
     d = os.path.dirname(os.path.abspath(md_path))
+    if os.path.basename(os.path.dirname(d)) == "Applications":
+        return os.path.join(d, base + ".pdf")
     node = d
     while node and node != os.path.dirname(node):
         if os.path.basename(node) == "Career":

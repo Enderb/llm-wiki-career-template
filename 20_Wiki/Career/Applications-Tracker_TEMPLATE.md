@@ -1,6 +1,6 @@
 # Applications Tracker
 
-Single navigation hub for every job application in the vault. Working files live in `20_Wiki/Career/Applications/[Company]/`; final PDFs live in `20_Wiki/Assets/`. Update the **Status** column as applications progress.
+Single navigation hub for every job application in the vault. Working files live in `20_Wiki/Career/Applications/[Company]/`; each tailored CV's rendered PDF sits next to it in that same folder (only the universal CV's PDF lives in `20_Wiki/Assets/`). Update the **Status** column as applications progress.
 
 ## Status Legend
 
