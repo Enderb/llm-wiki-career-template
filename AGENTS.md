@@ -111,7 +111,7 @@ When asked to search for jobs online or process a job URL:
 
 ### Workflow D: Career Input Ingest
 
-**Trigger:** "Log this feedback", "Add my recent project", "Save this accomplishment", "Update my resume".
+**Trigger:** "Log this feedback", "Add my recent project", "Save this accomplishment", "Update my resume", or pointing at an existing raw input file (e.g. "Ingest the feedback in `10_Raw/Career-Inputs/Feedback/[File].md`"). If the user names a file, read it from its subfolder; otherwise save the input they provide.
 
 **Execution Steps:**
 
