@@ -85,7 +85,13 @@ The agent ingests the posting, creates a company page, generates a match analysi
 scripts/setup.sh   # run once: creates a venv with reportlab + pdfminer.six at ~/.opencode-cv/venv
 ```
 
-If you onboarded with a PDF CV (Workflow 0), the styling is auto-detected into `scripts/cv_style.json` from `10_Raw/Assets/source-cv.pdf`. No PDF? Rendering falls back to clean defaults — no action needed. Render any CV using that venv's Python (the dependencies are **not** installed globally):
+If you onboarded with a PDF CV (Workflow 0), the styling is auto-detected into `scripts/cv_style.json` from `10_Raw/Assets/source-cv.pdf`. Run the detection with the **venv** Python (the dependencies are **not** installed globally — `scripts/cv_style.py` invoked directly will fail with `ModuleNotFoundError`):
+
+```bash
+~/.opencode-cv/venv/bin/python scripts/cv_style.py 10_Raw/Assets/source-cv.pdf
+```
+
+If you skip that, `scripts/cv_pdf.py` re-runs detection automatically on the first render whenever `scripts/cv_style.json` is still the placeholder, so your ground-truth styling is respected either way. No PDF? Rendering falls back to clean defaults — no action needed. Render any CV using that venv's Python:
 
 ```bash
 ~/.opencode-cv/venv/bin/python scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md
@@ -192,7 +198,7 @@ Use the templates in `10_Raw/Career-Inputs/` to keep inputs consistent.
 ## 🛠️ Troubleshooting & FAQ
 
 - **A PDF won't render.** Run `scripts/setup.sh` once, then invoke the venv's Python explicitly: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py <path>`.
-- **The PDF looks unstyled.** You're seeing the clean defaults from `scripts/cv_style.json` — run Workflow 0 with a PDF CV so your own styling is auto-detected (DOCX/text CVs fall back to clean defaults).
+- **The PDF looks unstyled.** You're seeing the clean defaults. Make sure your ground-truth CV PDF is in `10_Raw/Assets/`, then run `~/.opencode-cv/venv/bin/python scripts/cv_style.py 10_Raw/Assets/source-cv.pdf` (or just re-render — `cv_pdf.py` auto-detects from the reference PDF when `scripts/cv_style.json` is still the placeholder). DOCX/text CVs fall back to clean defaults.
 - **The PDFs land in the wrong folder.** A CV under `20_Wiki/Career/Applications/[Company]/` renders next to itself; any other CV under `20_Wiki/Career/` renders into `20_Wiki/Assets/`. Pass `--out` to force a path.
 - **Links like `[[Accomplishment-Log]]` are red/unresolved.** Run Workflow 0 to rename the `*_TEMPLATE.md` files to their real names.
 - **Empty folders are missing after a fresh clone.** Git doesn't track empty directories; the template ships `.gitkeep` markers so the full structure is restored.

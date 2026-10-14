@@ -2,7 +2,9 @@
 """Render a compiled CV markdown (20_Wiki/Career/Applications/[Company]/CV_*.md) into a styled PDF.
 
 Styling comes from scripts/cv_style.json, which cv_style.py extracts from the
-reference resume PDF added during ground-truth onboarding. Only the CV body is
+reference resume PDF added during ground-truth onboarding. If cv_style.json is
+still the shipped placeholder (source_pdf is null), detection is re-run
+automatically from 10_Raw/Assets/ before rendering. Only the CV body is
 rendered -- Match Summary / Application Notes / SOURCES are working documents
 and are excluded.
 
@@ -17,6 +19,7 @@ Usage:
     python cv_pdf.py <md> --style <json>   # override style config
 """
 import argparse
+import glob
 import json
 import os
 import re
@@ -73,6 +76,46 @@ def load_style(path):
         conf.setdefault("colors", {}).update(VOID["colors"])
         for k in ("sizes", "leading", "margins", "indents"):
             conf.setdefault(k, {}).update(VOID[k])
+    return conf
+
+
+def reference_pdf():
+    """Locate the ground-truth CV PDF used as the styling reference."""
+    assets = os.path.join(os.path.dirname(SCRIPT_DIR), "10_Raw", "Assets")
+    preferred = os.path.join(assets, "source-cv.pdf")
+    if os.path.exists(preferred):
+        return preferred
+    pdfs = sorted(glob.glob(os.path.join(assets, "*.pdf")))
+    return pdfs[0] if len(pdfs) == 1 else None
+
+
+def resolve_style(path):
+    """Load the style config, auto-detecting it from the reference CV PDF.
+
+    The repo ships scripts/cv_style.json as a placeholder (source_pdf is null).
+    Onboarding is supposed to overwrite it via cv_style.py, but if that step was
+    skipped or failed, the placeholder would silently render every CV in the
+    default style. Detect the user's own style on first render instead, then
+    persist it so subsequent renders are instant and consistent.
+    """
+    conf = load_style(path)
+    if conf.get("source_pdf"):
+        return conf
+    ref = reference_pdf()
+    if not ref:
+        return conf
+    try:
+        import cv_style
+        conf = cv_style.detect(ref)
+    except Exception as exc:  # keep rendering with clean defaults
+        print("warning: CV style detection failed (%s); using defaults" % exc,
+              file=sys.stderr)
+        return conf
+    if path:
+        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        with open(path, "w") as f:
+            json.dump(conf, f, indent=2)
+    print("detected CV style from %s -> %s" % (ref, path or "(in-memory)"))
     return conf
 
 
@@ -338,7 +381,7 @@ def main():
     ap.add_argument("--style", default=DEFAULT_STYLE)
     args = ap.parse_args()
 
-    conf = load_style(args.style)
+    conf = resolve_style(args.style)
     register_fonts(conf["font_family"])
     out = args.out or default_out(args.markdown, args.prefix)
     os.makedirs(os.path.dirname(out), exist_ok=True)
