@@ -77,7 +77,7 @@ On every content ingestion or wiki modification:
 
 1. Parse the user's provided CV file (PDF, DOCX, or text) from `/10_Raw/Ground-Truth/`, format it into clean Markdown, and save as `/10_Raw/Ground-Truth/Master_CV.md`.
 2. Parse the provided LinkedIn file/text (e.g., LinkedIn PDF export), convert it to structured Markdown, and save as `/10_Raw/Ground-Truth/LinkedIn_Profile.md`.
-3. Resolve onboarding placeholders: remove `Master_CV_TEMPLATE.md` and `LinkedIn_Profile_TEMPLATE.md`, and copy `Accomplishment-Log_TEMPLATE.md` → `Accomplishment-Log.md`, `Living-Resume_TEMPLATE.md` → `Living-Resume.md`, and `Applications-Tracker_TEMPLATE.md` → `Applications-Tracker.md` (delete the `_TEMPLATE` originals) so the `[[Accomplishment-Log]]`, `[[Living-Resume]]` and `[[Applications-Tracker]]` links resolve.
+3. Resolve onboarding placeholders: remove `Master_CV_TEMPLATE.md` and `LinkedIn_Profile_TEMPLATE.md`, and copy `Accomplishment-Log_TEMPLATE.md` → `Accomplishment-Log.md`, `Living-Resume_TEMPLATE.md` → `Living-Resume.md`, `Applications-Tracker_TEMPLATE.md` → `Applications-Tracker.md`, and `CV_Universal-Generalist_TEMPLATE.md` → `CV_Universal-Generalist.md` (delete the `_TEMPLATE` originals) so the `[[Accomplishment-Log]]`, `[[Living-Resume]]`, `[[Applications-Tracker]]` and `[[CV_Universal-Generalist]]` links resolve.
 4. If the provided CV was a PDF, save an unmodified copy to `/10_Raw/Assets/` (e.g. `source-cv.pdf`) as the styling reference, run `scripts/setup.sh` once, then run `scripts/cv_style.py /10_Raw/Assets/source-cv.pdf` to generate `scripts/cv_style.json`. If only a DOCX/text CV exists, skip this step — the PDF renderer falls back to clean defaults.
 5. Update `log.md` with: `## [YYYY-MM-DD] init | Ground truth files initialized from source documents`.
 
@@ -98,7 +98,7 @@ When asked to tailor a CV for a target job posting in `10_Raw/Job-Postings/`:
 2. Generate match summary (Match Score %, Key Strengths, Skill Gaps).
 3. Create `20_Wiki/Entities/[Company].md` if it does not exist.
 4. Output tailored resume in `20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` using standard ATS action-verb structures.
-5. Render the tailored CV to PDF: `scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` → `20_Wiki/Assets/Your_Name_CV_[Company]_[Role].pdf` (override the filename with `--prefix Your_Name`). The pipeline resolves `20_Wiki/Assets/` automatically for any CV anywhere under `20_Wiki/Career/`. This formats the markdown with the styling template detected during Workflow 0.
+5. Render the tailored CV to PDF: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` → `20_Wiki/Assets/Your_Name_CV_[Company]_[Role].pdf` (override the filename with `--prefix Your_Name`). Run `scripts/setup.sh` once first to create the venv — the renderer's dependencies are not installed globally. The pipeline resolves `20_Wiki/Assets/` automatically for any CV anywhere under `20_Wiki/Career/`. This formats the markdown with the styling template detected during Workflow 0.
 6. Execute Standard Maintenance Protocol — including adding/updating the application's row in `20_Wiki/Career/Applications-Tracker.md`.
 7. Optional outreach: draft connection/outreach notes as `Message_[Company]_[Role].md` in the same company folder and link them from the tracker's Notes column.
 

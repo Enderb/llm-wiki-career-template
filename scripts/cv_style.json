@@ -7,9 +7,9 @@
     "BODY": "#222222"
   },
   "sizes": {
-    "name": 17.0,
-    "section": 11.0,
-    "body": 10.0,
+    "name": 17,
+    "section": 11,
+    "body": 10,
     "role": 10,
     "tech": 9,
     "bullet": 10,
@@ -20,30 +20,27 @@
   },
   "leading": {
     "body": 12.2,
-    "section": 13.0,
+    "section": 13,
     "role": 11.5,
     "tech": 11.5,
     "bullet": 12.2,
     "skill": 13.1,
     "contact": 12.2,
-    "name": 19.0
+    "name": 19
   },
   "margins": {
-    "left": 45.1,
-    "right": 43.2,
-    "top": 52.0,
-    "bottom": 45.0
+    "left": 45,
+    "right": 45,
+    "top": 45,
+    "bottom": 45
   },
   "indents": {
     "bullet_x": 49.1,
-    "bullet_text_x": 63.5,
-    "bullet_indent": 4.0,
-    "text_indent": 18.4
+    "bullet_text_x": 58.1,
+    "bullet_indent": 4.1,
+    "text_indent": 13.1
   },
-  "date_tab_x": 297,
-  "inline_dates": [
-    "Elevat",
-    "Microsoft"
-  ],
+  "date_tab_x": 297.1,
+  "inline_dates": [],
   "source_pdf": null
 }

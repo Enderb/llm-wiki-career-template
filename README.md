@@ -42,8 +42,10 @@ Because raw facts and derived notes are kept separate, any wiki page can always 
 ### 1. Clone and open
 
 ```bash
-git clone https://github.com/<your-username>/llm-wiki-career-template.git my-career-wiki
+git clone https://github.com/Enderb/llm-wiki-career-template.git my-career-wiki
 ```
+
+(Cloning your own fork? Swap in its URL instead.)
 
 Open the folder as an Obsidian vault, and open the same folder in OpenCode (it auto-detects `AGENTS.md`). The Obsidian attachment folder is pre-configured to `10_Raw/Assets`.
 
@@ -66,16 +68,16 @@ The agent ingests the posting, creates a company page, generates a match analysi
 ### 4. Generate styled PDF résumés
 
 ```bash
-scripts/setup.sh   # run once: creates a venv with reportlab + pdfminer.six
+scripts/setup.sh   # run once: creates a venv with reportlab + pdfminer.six at ~/.opencode-cv/venv
 ```
 
-If you onboarded with a PDF CV (Workflow 0), the styling is auto-detected into `scripts/cv_style.json` from `10_Raw/Assets/source-cv.pdf`. No PDF? Rendering falls back to clean defaults — no action needed. Re-render any CV manually:
+If you onboarded with a PDF CV (Workflow 0), the styling is auto-detected into `scripts/cv_style.json` from `10_Raw/Assets/source-cv.pdf`. No PDF? Rendering falls back to clean defaults — no action needed. Render any CV using that venv's Python (the dependencies are **not** installed globally):
 
 ```bash
-scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md
+~/.opencode-cv/venv/bin/python scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md
 ```
 
-Output lands in `20_Wiki/Assets/` as `Your_Name_CV_[Company]_[Role].pdf`; override the prefix with `--prefix Maria_Lopez`.
+Output lands in `20_Wiki/Assets/` as `Your_Name_CV_[Company]_[Role].pdf`; override the prefix with `--prefix Maria_Lopez`. Optional shortcut: `alias cvpdf='~/.opencode-cv/venv/bin/python scripts/cv_pdf.py'`.
 
 ---
 
@@ -174,8 +176,8 @@ Use the templates in `10_Raw/Career-Inputs/` to keep inputs consistent.
 
 ## 🛠️ Troubleshooting & FAQ
 
-- **A PDF won't render.** Run `scripts/setup.sh` once (it installs `reportlab` + `pdfminer.six` into a venv).
-- **The PDF looks unstyled.** `scripts/cv_style.json` is missing — run Workflow 0 with a PDF CV so styling is auto-detected (DOCX/text CVs fall back to clean defaults).
+- **A PDF won't render.** Run `scripts/setup.sh` once, then invoke the venv's Python explicitly: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py <path>`.
+- **The PDF looks unstyled.** You're seeing the clean defaults from `scripts/cv_style.json` — run Workflow 0 with a PDF CV so your own styling is auto-detected (DOCX/text CVs fall back to clean defaults).
 - **The PDFs land in the wrong folder.** Run `scripts/cv_pdf.py` against a file under `20_Wiki/Career/`; the resolver finds `20_Wiki/Assets/` automatically from any subfolder.
 - **Links like `[[Accomplishment-Log]]` are red/unresolved.** Run Workflow 0 to rename the `*_TEMPLATE.md` files to their real names.
 - **Empty folders are missing after a fresh clone.** Git doesn't track empty directories; the template ships `.gitkeep` markers so the full structure is restored.

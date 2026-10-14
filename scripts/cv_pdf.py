@@ -91,7 +91,7 @@ def register_fonts(family):
 
 
 class Render:
-    def __init__(self, out, title, conf):
+    def __init__(self, out, title, conf, author="Your Name"):
         self.conf = conf
         self.c = conf["colors"]
         self.sz = conf["sizes"]
@@ -108,7 +108,7 @@ class Render:
 
         self.out = out
         self.doc = BaseDocTemplate(out, pagesize=page, title=title,
-                                   author="Ender Jose Barillas Rodriguez")
+                                   author=author)
         frame = Frame(self.left, m["bottom"], self.W, ph - self.TOP - m["bottom"],
                       id="f", leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
         self.doc.addPageTemplates([PageTemplate(id="p", frames=[frame])])
@@ -155,6 +155,8 @@ class Render:
     def name(self, title):
         self.story.append(Paragraph("<b>%s</b>" % self.inline(title), self.s_name))
         self.story.append(Spacer(1, 2))
+        self.doc.title = "%s - CV" % title
+        self.doc.author = title
         self.mode = "statics"
         self.pending_contact = 2
 
@@ -291,9 +293,16 @@ class Render:
         started = False
         for line in open(md_path, encoding="utf-8"):
             if not started:
-                if line.strip().startswith("# ENDER"):
+                stripped = line.strip()
+                # The CV body begins at the top-level name heading (e.g. "# JANE DOE").
+                # Skip the working-document H1 title (e.g. "# CV — Company Role") and
+                # any other H2+ section headings that precede it.
+                if stripped.startswith("# ") and not stripped.startswith("## "):
+                    heading = stripped[2:].strip()
+                    if heading.upper().startswith("CV"):
+                        continue
                     started = True
-                    self.name(line.strip()[2:].strip())
+                    self.name(heading)
                 continue
             if self.mode == "done":
                 break
@@ -327,7 +336,7 @@ def main():
     out = args.out or default_out(args.markdown, args.prefix)
     os.makedirs(os.path.dirname(out), exist_ok=True)
     label = os.path.basename(args.markdown)[3:-3]
-    r = Render(out, "Ender Jose Barillas Rodriguez - CV (%s)" % label, conf)
+    r = Render(out, "Resume (%s)" % label, conf)
     r.build(args.markdown)
     print("wrote:", out)
 
