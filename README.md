@@ -39,6 +39,20 @@ Because raw facts and derived notes are kept separate, any wiki page can always 
 - **[OpenCode](https://opencode.ai)** (or any terminal AI agent that reads `AGENTS.md`) — the execution engine.
 - **Git** and **Python 3** — Python is only needed for PDF rendering.
 
+> **OS note.** The setup script and the example commands use macOS/Linux paths. On Windows, run everything inside **WSL** or **Git Bash**. The venv location (`~/.opencode-cv/venv`) is only a default — override it with `CV_PDF_VENV=/path/to/venv scripts/setup.sh`, then call that venv's Python to render.
+
+#### ✅ Pre-flight checklist
+
+Work through this once before your first application:
+
+- [ ] Obsidian installed, and this folder opened as a vault.
+- [ ] OpenCode installed and able to open this folder (it reads `AGENTS.md`).
+- [ ] `git --version` and `python3 --version` both succeed.
+- [ ] `scripts/setup.sh` run once (it prints `ready: …/python`).
+- [ ] Your LinkedIn export and current CV dropped into `10_Raw/Ground-Truth/`.
+- [ ] Workflow 0 run → `Master_CV.md` and `LinkedIn_Profile.md` exist, and the `*_TEMPLATE.md` placeholders are gone.
+- [ ] A test render succeeds: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py <a CV_*.md>` writes a PDF into `20_Wiki/Assets/`.
+
 ### 1. Clone and open
 
 ```bash
