@@ -27,7 +27,8 @@ You are an intelligent knowledge assistant, research partner, and technical recr
 | `20_Wiki/Concepts/` | Evergreen atomic topic summaries | Create for recurring concepts/terms. |
 | `20_Wiki/Entities/` | Company, tool, and person profiles (people, companies, products) | Create one page per entity. |
 | `20_Wiki/Assets/` | Generated PDF resumes for CVs outside a company folder (the universal CV → `Your_Name_CV_Universal-Generalist.pdf`); tailored CV PDFs render into their `Applications/[Company]/` folder instead | Generated; never hand-edit, regenerate via the pipeline. |
-| `scripts/` | CV PDF pipeline: `cv_style.py` (extract composite styling → `cv_style.json`), `cv_pdf.py` (render `CV_*.md` → PDF), bundled fonts, `setup.sh` | Local tooling; edit freely. |
+| `scripts/` | CV PDF pipeline: `cv_style.py` (extract composite styling → `cv_style.json`), `cv_pdf.py` (render `CV_*.md` → PDF), bundled fonts, `setup.sh`, and `check_cv.sh` (runs the CV quality checks) | Local tooling; edit freely. |
+| `tests/` | CV quality checks (pytest): `test_tailored_cv.py` (companies, titles, dates, numbers, word/page limits), `test_llm_judge.py` (LLM-as-judge traceability), settings in `cv_checks.toml` | Local tooling; tune limits/sources in `cv_checks.toml`. Read-only towards `10_Raw/`. |
 | `/10_Raw/Assets/` | Downloaded images, diagrams, and local media | Store binaries and media here, never in wiki pages. |
 
 ## Career Workspace Layout
@@ -50,6 +51,7 @@ You are an intelligent knowledge assistant, research partner, and technical recr
 5. Wiki pages must use **wiki links** (`[[Page Name]]`) to reference other pages.
 6. Raw folder contents are facts; wiki pages are derived interpretations. Cite source files with `[[Links]]` from the `10_Raw/` or `20_Wiki/` folders.
 7. When ingesting a job posting, move/link a copy in `10_Raw/Job-Postings/` and create a matching page in `20_Wiki/Career/` for the user to evaluate.
+8. **Definition of done for any CV (tailored or universal): `scripts/check_cv.sh <path-to-CV.md>` passes.** Every check must PASS: company names, job titles, dates and numbers all appear in the source files; the CV is within the word and page limits; and the LLM judge finds no claim it cannot trace to a source. A SKIP on the LLM judge (no backend available) means **not done**: say so to the user instead of reporting the CV as finished. If a check fails, fix the **CV** (remove or reword the claim, or use the exact source fact) and re-run; never edit `10_Raw/` to make a check pass, and never loosen `tests/cv_checks.toml` without the user's say-so. Report the final check summary to the user.
 
 ## Standard Maintenance Protocol
 
@@ -99,8 +101,9 @@ When asked to tailor a CV for a target job posting in `10_Raw/Job-Postings/`:
 3. Create `20_Wiki/Entities/[Company].md` if it does not exist.
 4. Output tailored resume in `20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md` using standard ATS action-verb structures.
 5. Render the tailored CV to PDF: `~/.opencode-cv/venv/bin/python scripts/cv_pdf.py 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md`. Run `scripts/setup.sh` once first to create the venv — the renderer's dependencies are not installed globally. The renderer writes exactly one PDF, next to the source markdown as `CV_[Company]_[Role].pdf` (any CV under `Applications/[Company]/`; the universal CV in the Career root still renders to `20_Wiki/Assets/` with the `--prefix`). This formats the markdown with the styling template detected during Workflow 0.
-6. Execute Standard Maintenance Protocol — including adding/updating the application's row in `20_Wiki/Career/Applications-Tracker.md`.
-7. Optional outreach: draft connection/outreach notes as `Message_[Company]_[Role].md` in the same company folder and link them from the tracker's Notes column.
+6. **Quality gate (required):** run `scripts/check_cv.sh 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md`. It checks the CV against the sources (`Master_CV.md`, `LinkedIn_Profile.md`, `10_Raw/Career-Inputs/`, the [[Accomplishment-Log]]) and the length limits, then has an LLM judge list any claim it cannot trace. Fix every FAIL in the CV, re-render the PDF, and re-run until everything passes (Core Rule 8). Do not mark the application as tailored in the tracker, or tell the user it is done, until it passes.
+7. Execute Standard Maintenance Protocol — including adding/updating the application's row in `20_Wiki/Career/Applications-Tracker.md`.
+8. Optional outreach: draft connection/outreach notes as `Message_[Company]_[Role].md` in the same company folder and link them from the tracker's Notes column.
 
 ### Workflow C: Job Discovery & Web Ingest
 
@@ -157,4 +160,5 @@ When asked to search for jobs online or process a job URL:
 3. Flag duplicate pages (same company/role/concept) and propose merges.
 4. Confirm every `10_Raw/Sources/` and `10_Raw/Job-Postings/` file is linked from `index.md` (nothing left unprocessed) and that `10_Raw/` and `10_Raw/Assets/` were never modified.
 5. Verify each [[Applications-Tracker]] row matches its `Applications/[Company]/` folder; flag applications missing a CV, cover letter, or PDF.
-6. Append a `maintenance` entry to `log.md` summarizing findings and any fixes applied.
+6. Run `scripts/check_cv.sh --no-llm` over every CV and flag each failing CV (run the full check, with the LLM judge, on any CV the user is about to send).
+7. Append a `maintenance` entry to `log.md` summarizing findings and any fixes applied.

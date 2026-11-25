@@ -99,6 +99,25 @@ If you skip that, `scripts/cv_pdf.py` re-runs detection automatically on the fir
 
 The PDF is written next to the CV as `CV_[Company]_[Role].pdf`, so the whole application folder travels together. A CV outside a company folder (e.g. the universal CV in the Career root) renders into `20_Wiki/Assets/` as `Your_Name_CV_*.pdf`; override the prefix with `--prefix Maria_Lopez`. Optional shortcut: `alias cvpdf='~/.opencode-cv/venv/bin/python scripts/cv_pdf.py'`.
 
+### 5. Check every CV before you send it
+
+Each CV is checked against your source files before it counts as done (the agent does this automatically in Workflow B):
+
+```bash
+scripts/check_cv.sh 20_Wiki/Career/Applications/[Company]/CV_[Company]_[Role].md
+```
+
+| Check | Passes when |
+|---|---|
+| Company names, job titles, dates | each one appears in your sources (`Master_CV.md`, `LinkedIn_Profile.md`, `10_Raw/Career-Inputs/`, the Accomplishment Log) |
+| Numbers / metrics | every figure ("100x", "500K", "44.3%") appears in a source |
+| Length | at most 900 words and 2 PDF pages (edit `tests/cv_checks.toml`) |
+| LLM judge | a model reads the CV next to your sources and finds no claim it can't trace |
+
+Run it with no path to check every CV, or add `--no-llm` for the fast checks only. The report lists every failing item and how to fix it.
+
+**The LLM judge works with whatever you already use.** It picks the first available option: the Anthropic API (if `ANTHROPIC_API_KEY` is set) → the Claude Code CLI (`claude`) → the OpenCode CLI (`opencode`, including its free models). Force one with `CV_JUDGE_BACKEND=anthropic|claude|opencode` and pick a model with `CV_JUDGE_MODEL`. If none is available, the judge is reported as **SKIPPED**, which does not count as passing. Verdicts are cached in `.cache/cv-judge/`, so re-checking an unchanged CV is free. Stricter models flag more; the report names the backend and model behind each verdict.
+
 ---
 
 ## 🗂️ How applications are organized
@@ -126,7 +145,7 @@ Prompt the agent using any of these; the full instructions live in [`AGENTS.md`]
 |---|----------|----------------|--------------|
 | **0** | Ground-Truth Onboarding | *"Run Workflow 0 to initialize my ground-truth files."* | Import your CV + LinkedIn → `Master_CV.md`, `LinkedIn_Profile.md`, career templates |
 | **A** | General Knowledge Ingest | *"Run Workflow A on `@10_Raw/Sources/article.md`."* | Distill sources into company/tool/concept pages |
-| **B** | CV Tailoring & Application Synthesis | *"Run Workflow B on `@10_Raw/Job-Postings/role.md`."* | Match analysis → tailored CV → PDF → tracker row |
+| **B** | CV Tailoring & Application Synthesis | *"Run Workflow B on `@10_Raw/Job-Postings/role.md`."* | Match analysis → tailored CV → PDF → quality checks → tracker row |
 | **C** | Job Discovery & Web Ingest | *"Run Workflow C on <job URL>."* | Save the posting, then auto-run Workflow B |
 | **D** | Career Input Ingest | *"Log this feedback"*, *"Add my latest project."* | STAR entry → accomplishment log → refresh living résumé |
 | **E** | Outreach & Networking | *"Draft a connection note for the hiring manager."* | Outreach/LinkedIn message saved in the company folder |
@@ -188,7 +207,8 @@ Use the templates in `10_Raw/Career-Inputs/` to keep inputs consistent.
 | `20_Wiki/Entities/` | Knowledge pages for companies, tools, and people. | **Compiled AI layer** |
 | `20_Wiki/Concepts/` | Evergreen topic and domain summaries synthesized across sources. | **Compiled AI layer** |
 | `20_Wiki/Assets/` | Generated PDF résumés for CVs that don't live in an `Applications/[Company]/` folder. | **Generated output** |
-| `scripts/` | CV PDF pipeline: `cv_style.py` (detect styling → `cv_style.json`), `cv_pdf.py` (render `CV_*.md` → PDF), bundled fonts, `setup.sh`. | **Local tooling** |
+| `scripts/` | CV PDF pipeline: `cv_style.py` (detect styling → `cv_style.json`), `cv_pdf.py` (render `CV_*.md` → PDF), bundled fonts, `setup.sh`, `check_cv.sh` (CV quality checks). | **Local tooling** |
+| `tests/` | CV quality checks (pytest + LLM judge); limits and source files in `cv_checks.toml`. | **Local tooling** |
 | `AGENTS.md` | The rules and workflows the agent follows. | **System config** |
 | `index.md` | Catalog of every wiki note, auto-updated by the agent. | **Navigation ledger** |
 | `log.md` | Timestamped audit trail of every agent action. | **Audit ledger** |

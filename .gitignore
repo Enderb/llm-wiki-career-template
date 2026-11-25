@@ -10,3 +10,7 @@ Thumbs.db
 # Python
 __pycache__/
 *.pyc
+
+# CV quality checks
+.cache/
+.pytest_cache/

@@ -1,0 +1,35 @@
+# Configuration for the tailored-CV quality checks (scripts/check_cv.sh).
+# Paths are relative to the vault root and support ** globs.
+
+[sources]
+# Files a CV claim must trace back to. Raw ground truth + career inputs, plus
+# the Accomplishment-Log (distilled from those inputs via Workflow D).
+include = [
+  "10_Raw/Ground-Truth/*.md",
+  "10_Raw/Career-Inputs/**/*.md",
+  "20_Wiki/Career/Accomplishment-Log.md",
+]
+exclude = ["*_TEMPLATE.md"]
+
+[cvs]
+# CVs checked when no --cv path is given.
+include = [
+  "20_Wiki/Career/Applications/**/CV_*.md",
+  "20_Wiki/Career/CV_*.md",
+]
+exclude = ["*_TEMPLATE.md"]
+
+[limits]
+# Override per run with CV_MAX_WORDS / CV_MAX_PAGES.
+max_words = 900   # CV body only (name to Awards); working notes are excluded
+max_pages = 2     # pages of the rendered PDF
+
+[judge]
+# auto = anthropic (if ANTHROPIC_API_KEY is set) -> claude CLI -> opencode CLI.
+# Override per run with CV_JUDGE_BACKEND=anthropic|claude|opencode.
+backend = "auto"
+# Model per backend (CV_JUDGE_MODEL overrides). Empty = the CLI's own default.
+anthropic_model = "claude-opus-5-5"
+claude_model = ""
+opencode_model = ""   # e.g. "anthropic/claude-opus-5-5" or any provider/model
+timeout_seconds = 600

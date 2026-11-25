@@ -1,2 +1,4 @@
 reportlab>=4.0
 pdfminer.six>=20221105
+pytest>=8.0
+anthropic>=2.0
