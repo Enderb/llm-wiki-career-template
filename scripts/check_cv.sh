@@ -5,6 +5,7 @@
 #   scripts/check_cv.sh                                   # every CV in the vault
 #   scripts/check_cv.sh 20_Wiki/Career/Applications/Acme/CV_Acme_Role.md [more.md ...]
 #   scripts/check_cv.sh --no-llm <cv.md>                  # skip the LLM judge
+#   scripts/check_cv.sh --llm-only <cv.md>                # only the LLM judge
 #
 # Environment:
 #   CV_JUDGE_BACKEND=anthropic|claude|opencode   force the LLM-judge backend (default: auto)
@@ -28,13 +29,16 @@ if [ ! -x "$PY" ] || ! "$PY" -c "import pytest, pdfminer, reportlab" 2>/dev/null
 fi
 
 args=()
-for a in "$@"; do
-  case "$a" in
+while [ $# -gt 0 ]; do
+  case "$1" in
     --no-llm) args+=(-m "not llm") ;;
-    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
-    -*) args+=("$a") ;;
-    *) args+=(--cv "$a") ;;
+    --llm-only) args+=(-m "llm") ;;
+    -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
+    -k|-m) args+=("$1" "$2"); shift ;;   # pytest options that take a value
+    -*) args+=("$1") ;;
+    *) args+=(--cv "$1") ;;
   esac
+  shift
 done
 
 cd "$VAULT"

@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 
 from cvcheck import VAULT, load_config
 
-PROMPT_VERSION = "1"
+PROMPT_VERSION = "2"
 CACHE_DIR = os.path.join(VAULT, ".cache", "cv-judge")
 
 SCHEMA = {
@@ -68,8 +68,20 @@ Rules:
   (a bigger number, a more senior title, a different date, a stronger outcome, a
   responsibility nobody mentions), or if it adds a technology/skill that no
   source mentions.
+- A general category label for something a source states is SUPPORTED (for
+  example "release engineering" for cutting a release cycle from 3 weeks to 4
+  hours, or "mentoring" for helping named teammates grow). It must name the
+  kind of work the source describes, not upgrade it.
+- A specific tool, technology, framework, protocol or method (for example a
+  product name, "REST", "Kanban", "schema design") is UNSUPPORTED unless a
+  source names it. A category label never covers a specific name.
+- Judge SUMMARY or profile sentences against the candidate's record as a
+  whole: they may frame or select from it (e.g. "10 years shipping web
+  products" when the record shows 10 years that include web work), but any
+  number, title, technology or outcome in them must still be supported.
 - Generic self-descriptions with no checkable fact ("ramps up fast",
   "user-centric") are not claims; skip them.
+- Report each unsupported claim once, even if the CV repeats it.
 - Do not use outside knowledge. Do not give the benefit of the doubt.
 
 Answer with ONLY a JSON object, no prose and no code fences, in exactly this shape:
@@ -86,6 +98,7 @@ class Verdict:
     unsupported: list[dict] = field(default_factory=list)
     claims_checked: int = 0
     cached: bool = False
+    skipped_backends: list[str] = field(default_factory=list)
 
 
 class JudgeUnavailable(Exception):
@@ -116,21 +129,27 @@ def _has_anthropic() -> bool:
     return True
 
 
-def pick_backend(conf: dict) -> str:
+def backend_candidates(conf: dict) -> list[str]:
+    """Backends to try, in order. A forced backend is the only candidate;
+    in auto mode every installed one is listed, so a CLI that is installed but
+    not logged in falls through to the next."""
     wanted = (os.environ.get("CV_JUDGE_BACKEND") or conf["judge"]["backend"] or "auto").lower()
     if wanted != "auto":
         if wanted not in ("anthropic", "claude", "opencode"):
             raise JudgeUnavailable(f"unknown CV_JUDGE_BACKEND '{wanted}' (use anthropic, claude or opencode)")
-        return wanted
+        return [wanted]
+    found = []
     if _has_anthropic():
-        return "anthropic"
+        found.append("anthropic")
     if shutil.which("claude"):
-        return "claude"
+        found.append("claude")
     if shutil.which("opencode"):
-        return "opencode"
-    raise JudgeUnavailable(
-        "no LLM backend available: set ANTHROPIC_API_KEY (and run scripts/setup.sh), "
-        "or install the `claude` or `opencode` CLI")
+        found.append("opencode")
+    if not found:
+        raise JudgeUnavailable(
+            "no LLM backend available: set ANTHROPIC_API_KEY (and run scripts/setup.sh), "
+            "or install the `claude` or `opencode` CLI")
+    return found
 
 
 def _model_for(backend: str, conf: dict) -> str:
@@ -185,7 +204,8 @@ def _run_cli(cmd: list[str], prompt: str, timeout: int, attach_as: str | None = 
         except subprocess.TimeoutExpired as exc:
             raise JudgeError(f"`{cmd[0]}` timed out after {timeout}s") from exc
     if proc.returncode != 0:
-        raise JudgeError(f"`{cmd[0]}` exited {proc.returncode}: {proc.stderr.strip()[-500:]}")
+        detail = (proc.stderr.strip() or proc.stdout.strip())[-500:]
+        raise JudgeError(f"`{cmd[0]}` exited {proc.returncode}: {detail}")
     return proc.stdout
 
 
@@ -240,29 +260,35 @@ def parse_answer(text: str) -> dict:
 
 
 # ---------------------------------------------------------------------- main
-def judge(cv_text: str, sources: dict[str, str], conf: dict | None = None) -> Verdict:
-    conf = conf or load_config()
-    backend = pick_backend(conf)
+def _judge_with(backend: str, prompt: str, conf: dict) -> tuple[dict, str, bool]:
     model = _model_for(backend, conf)
     timeout = int(conf["judge"].get("timeout_seconds", 600))
-    prompt = build_prompt(cv_text, sources)
-
     key = hashlib.sha256(
         "\0".join([PROMPT_VERSION, backend, model, prompt]).encode()).hexdigest()[:32]
     cache_file = os.path.join(CACHE_DIR, key + ".json")
-    use_cache = os.environ.get("CV_JUDGE_NO_CACHE") != "1"
-    if use_cache and os.path.exists(cache_file):
+    if os.environ.get("CV_JUDGE_NO_CACHE") != "1" and os.path.exists(cache_file):
         with open(cache_file, encoding="utf-8") as fh:
-            data = json.load(fh)
-        cached = True
-    else:
-        data = parse_answer(RUNNERS[backend](prompt, model, timeout))
-        cached = False
-        os.makedirs(CACHE_DIR, exist_ok=True)
-        with open(cache_file, "w", encoding="utf-8") as fh:
-            json.dump(data, fh, indent=2)
+            return json.load(fh), model, True
+    data = parse_answer(RUNNERS[backend](prompt, model, timeout))
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    with open(cache_file, "w", encoding="utf-8") as fh:
+        json.dump(data, fh, indent=2)
+    return data, model, False
 
-    claims = [c if isinstance(c, dict) else {"claim": str(c)} for c in data["unsupported_claims"]]
-    return Verdict(backend=backend, model=model or "(CLI default)",
-                   unsupported=claims, claims_checked=int(data.get("claims_checked") or 0),
-                   cached=cached)
+
+def judge(cv_text: str, sources: dict[str, str], conf: dict | None = None) -> Verdict:
+    conf = conf or load_config()
+    candidates = backend_candidates(conf)
+    prompt = build_prompt(cv_text, sources)
+    errors = []
+    for backend in candidates:
+        try:
+            data, model, cached = _judge_with(backend, prompt, conf)
+        except (JudgeError, JudgeUnavailable) as exc:
+            errors.append(f"{backend}: {exc}")
+            continue
+        claims = [c if isinstance(c, dict) else {"claim": str(c)} for c in data["unsupported_claims"]]
+        return Verdict(backend=backend, model=model or "(CLI default)",
+                       unsupported=claims, claims_checked=int(data.get("claims_checked") or 0),
+                       cached=cached, skipped_backends=[e.split(":")[0] for e in errors])
+    raise JudgeError("no backend produced a verdict:\n" + "\n".join(errors))

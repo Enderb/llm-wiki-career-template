@@ -15,6 +15,8 @@ def test_llm_judge(cv, sources, conf, request):
         pytest.fail(f"judge could not run: {exc}", pytrace=False)
 
     info = f"{verdict.backend}, {verdict.model}, {verdict.claims_checked} claims checked"
+    if verdict.skipped_backends:
+        info += ", fell back from " + "/".join(verdict.skipped_backends)
     request.node._cv_info = info + (", cached" if verdict.cached else "")
     if verdict.unsupported:
         lines = [f"{len(verdict.unsupported)} claim(s) the judge could not trace to a source:"]
