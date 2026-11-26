@@ -235,3 +235,7 @@ Everything is local markdown files you own. The vault itself uploads nothing; on
 ## 🙏 Credits
 
 Built on the **LLM Wiki pattern** — using a plain-markdown vault as shared, transparent memory between you and an AI agent.
+
+## 📄 License
+
+Released under the [MIT License](LICENSE): use, change and share it freely, including commercially, as long as you keep the copyright notice. The bundled Carlito fonts in `scripts/fonts/` are under the [SIL Open Font License 1.1](scripts/fonts/OFL.txt).
