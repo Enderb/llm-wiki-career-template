@@ -215,7 +215,7 @@ class Render:
         self.story.append(Paragraph(
             '<font name="%s" color="%s"><b>%s</b></font>'
             '<font name="%s" color="%s">&#160;&#160;%s</font>'
-            % (self.family, self.c["BODY"], name, self.family, self.c["GRAY"], date),
+            % (self.family, self.c["BODY"], self.inline(name), self.family, self.c["GRAY"], date),
             self.s_company))
 
     def role(self, line):
@@ -282,6 +282,8 @@ class Render:
 
     def inline(self, md):
         xml = md.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        # [text](https://...) -> clickable link; any other target keeps just the text
+        xml = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r'<a href="\2">\1</a>', xml)
         xml = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", xml)
         xml = re.sub(r"\[\[([^\]]+)\]\]", r"\1", xml)
         xml = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", xml)
@@ -295,7 +297,6 @@ class Render:
             return
         if self.mode == "statics":
             after = re.sub(r"\[([^\]\|]+)\|[^]]*\]", r"\1", raw)
-            after = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", after)
             if "linkedin" in after:
                 self.story.append(Paragraph(self.inline(after), self.s_contact_navy))
             else:
