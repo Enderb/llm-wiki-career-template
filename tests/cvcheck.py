@@ -173,6 +173,7 @@ def parse_cv(path: str) -> CV:
 def _company_name(heading: str) -> str:
     # "Accretive Technology Group — Live Video Streaming · *Aug. 2019 – Jul. 2025*"
     name = re.split(r"\s+[—–|·]\s+|\s+-\s+", heading)[0]
+    name = re.sub(r"\s*\([^)]*\)", "", name)  # drop a parenthetical such as a repo URL
     return strip_md(name).strip()
 
 
